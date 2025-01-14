@@ -1,5 +1,4 @@
-using Combinatorics
-using ArgCheck
+using Combinatorics, ArgCheck
 
 function format(B::Vector{String})
     # Recibe la betweenness como una lista con str de largo 3

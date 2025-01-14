@@ -1,4 +1,4 @@
-function listvert(L)
+function listvert(L::Vector{String})
     n = length(L)
     char = String[]
     for i in 1:n
