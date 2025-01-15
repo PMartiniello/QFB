@@ -1,7 +1,7 @@
 function listvert(L::Vector{String})
-    n = length(L)
+    # n = length(L)
     char = String[]
-    for i in 1:n
+    for i in eachindex(L)
         # Dividir la cadena en caracteres y convertirlos a String
         a, b, c = map(String, split(L[i], ""))
         push!(char, a)
