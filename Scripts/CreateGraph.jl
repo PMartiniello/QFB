@@ -1,8 +1,9 @@
+using Graphs
 function creategraph(B::Vector{String})
     #Recibe la betweenness B y entrega el grafo en caso de que sea factible
     modelo, Q, V = quasimetric(B)
     #Si es infactible no retorna nada
-    if Q == nothing
+    if Q === nothing
         return nothing
     else
         optimize!(modelo)
@@ -30,7 +31,7 @@ function creategraph(B::Vector{String})
     tiempo_modelo= @elapsed (modelo);
     tiempo_ejecucion = @elapsed (optimize!(modelo));
     println(String("Se tardó $tiempo_modelo segundos en crear el modelo y $tiempo_ejecucion en resolverlo"))
-    for i in 0:length(V)
+    for i in getindex(V) #0:length(V)
         if i == 0
             print(V, "\n")
         else
