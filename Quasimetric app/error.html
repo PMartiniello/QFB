@@ -7,12 +7,12 @@
 </head>
 <body>
     <h1>Formulario de Cuasimétrica</h1>
-    <!-- {{#error_message}}
+    {{#error_message}}
         <p style="color: red;">{{error_message}}</p>
-    {{/error_message}} -->
+    {{/error_message}}
     <form action="/quasimetric/" method="get">
         <label for="betweenness">Tríos separados por coma:</label>
-        <input type="text" id="betweenness" name="betweenness" placeholder="abc, cba, ... / 123, 321, ..." value="" required>
+        <input type="text" id="betweenness" name="betweenness" value="{{input_value}}" required>
         <button type="submit">Enviar</button>
     </form>
 </body>

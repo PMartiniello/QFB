@@ -1,5 +1,5 @@
 using Graphs
-function creategraph(B::Vector{String})
+function creategraph(B::Vector)
     #Recibe la betweenness B y entrega el grafo en caso de que sea factible
     modelo, Q, V = quasimetric(B)
     #Si es infactible no retorna nada
@@ -12,8 +12,8 @@ function creategraph(B::Vector{String})
         add_vertices!(G, n) #Crea los vértices en el grafo
         elabels = []  # Lista para las etiquetas de las aristas
 
-        for i in 1:n
-            for j in 1:n
+        for i in eachindex(V)
+            for j in eachindex(V)
                 if i != j
                     #Para cada par distinto de vértices agrega la arista con el peso dado por Q
                     add_edge!(G,i,j)
@@ -39,6 +39,6 @@ function creategraph(B::Vector{String})
         end
     end
     # Grafica el grafo
-    gplot(G, nodelabel=1:n, edgelabel=elabels, linetype="curve", layout=circular_layout,
+    gplot(G, nodelabel=eachindex(V), edgelabel=elabels, linetype="curve", layout=circular_layout,
         outangle=pi/7, background_color="grey", plot_size=(15cm, 15cm), pad=1cm)
 end

@@ -2,9 +2,6 @@ using Oxygen
 using HTTP
 using Mustache
 
-# include("../Scripts/ListVert.jl")
-# include("../Scripts/Format.jl")
-# include("../Scripts/Quasimetric.jl")
 include.(filter(contains(r".jl$"), readdir("../Scripts/"; join=true)))
 
 function render_html(html_file::String, context::Dict = Dict(); status = 200, headers = ["Content-Type" => "text/html; charset_utf-8"]) :: HTTP.Response
@@ -29,45 +26,32 @@ end
     return listvert(betweenness)
 end
 
-# @get "/quasimetric/{betweenness}" function (req::HTTP.Request, betweenness::Vector{String})
-#     qm, valores_x, v = quasimetric(betweenness)
-
-#     # No necesitas optimizar nuevamente, ya que el modelo fue optimizado dentro de quasimetric.
-#     # Si quieres optimizar el modelo fuera de la función, asegúrate de pasar solo el modelo:
-#     if qm !== nothing
-#         optimize!(qm)  # Llama a optimize! solo si necesitas optimizar de nuevo
-#     end
-        
-#     tiempo_modelo= @elapsed (qm);
-#     tiempo_ejecucion = @elapsed (optimize!(qm));
-
-#     # println(String("Se tardó $tiempo_modelo segundos en crear el modelo y $tiempo_ejecucion en resolverlo"))
-        
-#     # println(v)
-#     A = Vector[]
-#     # A[1] = v
-#     for i in eachindex(v)
-#         push!(A,valores_x[i,:])
-#     end
-#     return v, A
-#     end
 @get "/home" function (req::HTTP.Request)
     render_html("home.html")
 end
 
-# @get "/quasimetric/{betweenness}" function (req::HTTP.Request)
-#     form_data = queryparams(req)
-    
-#     betweenness = form_data["betweenness"]
-#     b_format = split(betweenness, ",")
-#     qm, valores_x, v = quasimetric(b_format)
-#     A = Vector[]
-#     for i in eachindex(v)
-#         push!(A,valores_x[i,:])
-#     end
-#     return v, A
+function create_html_table(valores_x, v)
+    table_rows = String[]
+    for i in eachindex(v)
+        row = "<tr><th>$(v[i])</th>" * join(["<td>$(round(valores_x[i, j], digits=2))</td>" for j in eachindex(v)], "") * "</tr>"
+        push!(table_rows, row)
+    end
 
-# end
+    return """
+    <table border="1" style="border-collapse: collapse; text-align: center; width: 100%;">
+        <thead>
+            <tr style="background-color: #f4f4f4;">
+                <th></th>
+                $(join(["<th>$(v[j])</th>" for j in eachindex(v)], ""))
+            </tr>
+        </thead>
+        <tbody>
+            $(join(table_rows, ""))
+        </tbody>
+    </table>
+    """
+end
+
 
 @get "/quasimetric/" function (req::HTTP.Request)
     # Obtener los parámetros de consulta
@@ -79,26 +63,32 @@ end
     end
     
     betweenness = form_data["betweenness"]
-    # triples_list = split(betweenness, ",") # Convertir la cadena en una lista de cadenas
-    # triples_list = map(String, split(betweenness, ",")) # Convertir a Vector{String}
     triples_list = map(s -> strip(String(s)), split(betweenness, ","))
     b_format = map(String, triples_list)
-    # Contexto para renderizar el HTML
-    # context = Dict(
-    #     "input_triples" => join(triples_list, ", "),
-    #     "result" => join(result, ", ")
-    # )
-    
-    # # Renderizar la página de resultados
-    # return render_html("result.html", context)
-    qm, valores_x, v = quasimetric(b_format)
-    A = Vector[]
-    for i in eachindex(v)
-        push!(A,valores_x[i,:])
-    end
-    return v, A
-   
 
+    modelo, valores_x, v = quasimetric(b_format)
+    if valores_x === nothing
+        error_context = Dict(
+            "error_message" => "La betweenness proporcionada no es factible.",
+            "input_value" => betweenness
+        )
+        return render_html("error.html", error_context)
+    end
+    
+    Q = [valores_x[i, :] for i in eachindex(v)]
+
+    # Crear tabla HTML
+    html_table = create_html_table(valores_x, v)
+
+    # Contexto para renderizar el HTML
+    context = Dict(
+        "input_triples" => join(triples_list, ", "),
+        "vertices" => join(v, ", "),
+        "html_table" => html_table
+    )
+    
+    # Renderizar la página de resultados
+    return render_html("result.html", context)
 end
 
 

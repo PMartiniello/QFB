@@ -8,6 +8,17 @@ function listvert(L::Vector{String})
         push!(char, b)
         push!(char, c)
     end
-    char = unique(char)  # Eliminar caracteres repetidos
-    return char
+    return unique(char)  # Eliminar caracteres repetidos
+end
+
+function listvert(L::Vector{Int64})
+    vert = Int64[]
+    for i in eachindex(L)
+        u, d, c = digits(i) #a unidad, b decena, c centena
+
+        push!(vert, c)
+        push!(vert, d)
+        push!(vert, u)
+    end
+    return unique(vert)
 end
