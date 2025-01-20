@@ -58,22 +58,58 @@ function create_html_table(valores_x, v)
     </table>
     """
 end
+# function create_html_table(matrix, vertices)
+#     table = "<table>"
+#     table *= "<thead><tr><th>Vértices</th>"
+#     for vertex in vertices
+#         table *= "<th>$vertex</th>"
+#     end
+#     table *= "</tr></thead><tbody>"
+#     for (i, row) in enumerate(eachrow(matrix))
+#         table *= "<tr><td><strong>$(vertices[i])</strong></td>"
+#         for value in row
+#             table *= "<td>$value</td>"
+#         end
+#         table *= "</tr>"
+#     end
+#     table *= "</tbody></table>"
+#     return table
+# end
+
 
 
 @get "/quasimetric/" function (req::HTTP.Request)
     # Obtener los parámetros de consulta
     form_data = queryparams(req)
-    
+    betweenness = get(form_data, "betweenness", "")
+    symmetry_option = get(form_data, "symmetry", "")
+
     # Procesar el parámetro betweenness
+    # if !haskey(form_data, "betweenness")
+    #     return HTTP.Response(400, "Parámetro 'betweenness' faltante.")
+    # end
     if !haskey(form_data, "betweenness")
-        return HTTP.Response(400, "Parámetro 'betweenness' faltante.")
+        return HTTP.Redirect("http://127.0.0.1:8001/home")
     end
     
     betweenness = form_data["betweenness"]
     triples_list = map(s -> strip(String(s)), split(betweenness, ","))
-    b_format = map(String, triples_list)
+    b_format = unique(map(String, triples_list))
 
-    modelo, valores_x, v = quasimetric(b_format)
+    # Calcular quasimetric según la selección
+    symtype = symmetry_option == "symmetric" ? sym() : nosym()
+    modelo, valores_x, v = quasimetric(b_format, symtype)
+
+    # modelo, valores_x, v = quasimetric(b_format)
+
+    if modelo === nothing
+        error_context = Dict(
+            "error_message" => "El formato no es correcto, por favor entregue tríos.",
+            "input_value" => betweenness
+        )
+        return render_html("error.html", error_context)
+    end
+
     if valores_x === nothing
         error_context = Dict(
             "error_message" => "La betweenness proporcionada no es factible.",
@@ -89,7 +125,7 @@ end
 
     # Contexto para renderizar el HTML
     context = Dict(
-        "input_triples" => join(triples_list, ", "),
+        "input_triples" => join(unique(b_format), ", "),
         "vertices" => join(v, ", "),
         "html_table" => html_table
     )
