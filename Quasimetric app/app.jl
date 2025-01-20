@@ -1,12 +1,12 @@
 using Oxygen
 using HTTP
 using Mustache
-using Dash
-using DashHtmlComponents
-const html = DashHtmlComponents
-using DashCoreComponents
-const dcc = DashCoreComponents
-using DashCytoscape
+# using Dash
+# using DashHtmlComponents
+# const html = DashHtmlComponents
+# using DashCoreComponents
+# const dcc = DashCoreComponents
+# using DashCytoscape
 using Graphs
 
 include.(filter(contains(r".jl$"), readdir("../Scripts/"; join=true)))
@@ -98,66 +98,66 @@ end
     return render_html("result.html", context)
 end
 
-function create_interactive_graph(B::Vector, html_file::String)
-    # Recibe la betweenness B y genera la página con el grafo interactivo
-    modelo, Q, V = quasimetric(B)
+# function create_interactive_graph(B::Vector, html_file::String)
+#     # Recibe la betweenness B y genera la página con el grafo interactivo
+#     modelo, Q, V = quasimetric(B)
     
-    if Q === nothing
-        # Si no es factible, regresa un mensaje de error
-        error_context = Dict(
-            "error_message" => "La betweenness proporcionada no es factible."
-        )
-        return render_html("form.html", error_context)
-    else
-        optimize!(modelo)
-        n = length(V)  # Cantidad de vértices
+#     if Q === nothing
+#         # Si no es factible, regresa un mensaje de error
+#         error_context = Dict(
+#             "error_message" => "La betweenness proporcionada no es factible."
+#         )
+#         return render_html("form.html", error_context)
+#     else
+#         optimize!(modelo)
+#         n = length(V)  # Cantidad de vértices
         
-        # Crear lista de nodos
-        nodes = [Dict("data" => Dict("id" => string(i), "label" => string(V[i]))) for i in 1:n]
+#         # Crear lista de nodos
+#         nodes = [Dict("data" => Dict("id" => string(i), "label" => string(V[i]))) for i in 1:n]
 
-        # Crear lista de aristas
-        edges = []
-        for i in 1:n
-            for j in 1:n
-                if i != j
-                    # Agregar la arista con el peso como etiqueta
-                    push!(edges, Dict(
-                        "data" => Dict("source" => string(i), "target" => string(j), "label" => string(round(Q[i, j], digits=2)))
-                    ))
-                    if midpoint(B, i, j) == true
-                        # Remover la arista directa si hay un vértice intermedio
-                        pop!(edges)
-                    end
-                end
-            end
-        end
+#         # Crear lista de aristas
+#         edges = []
+#         for i in eachindex(V)
+#             for j in eachindex(V)
+#                 if i != j
+#                     # Agregar la arista con el peso como etiqueta
+#                     push!(edges, Dict(
+#                         "data" => Dict("source" => string(i), "target" => string(j), "label" => string(round(Q[i, j], digits=2)))
+#                     ))
+#                     if midpoint(B, i, j) == true
+#                         # Remover la arista directa si hay un vértice intermedio
+#                         pop!(edges)
+#                     end
+#                 end
+#             end
+#         end
 
-        # Crear grafo interactivo con Cytoscape
-        app = dash()
+#         # Crear grafo interactivo con Cytoscape
+#         app = dash()
 
-        app.layout = html.div([
-            html.h1("Grafo Interactivo de Cuasimétrica"),
-            dcc.Input(
-                id="betweenness-input",
-                placeholder="Ingrese los tríos de betweenness...",
-                type="text",
-                value=join(B, ", ")
-            ),
-            DashCytoscape.cytoscape(
-                id="cytoscape",
-                style=Dict("width" => "100%", "height" => "600px"),
-                elements=vcat(nodes, edges),
-                layout=Dict("name" => "cose", "animate" => true),  # Layout interactivo
-                stylesheet=[
-                    Dict("selector" => "node", "style" => Dict("label" => "data(label)", "background-color" => "#0074D9")),
-                    Dict("selector" => "edge", "style" => Dict("label" => "data(label)", "line-color" => "#FF4136", "width" => 2))
-                ]
-            )
-        ])
+#         app.layout = html.div([
+#             html.h1("Grafo Interactivo de Cuasimétrica"),
+#             dcc.Input(
+#                 id="betweenness-input",
+#                 placeholder="Ingrese los tríos de betweenness...",
+#                 type="text",
+#                 value=join(B, ", ")
+#             ),
+#             DashCytoscape.cytoscape(
+#                 id="cytoscape",
+#                 style=Dict("width" => "100%", "height" => "600px"),
+#                 elements=vcat(nodes, edges),
+#                 layout=Dict("name" => "cose", "animate" => true),  # Layout interactivo
+#                 stylesheet=[
+#                     Dict("selector" => "node", "style" => Dict("label" => "data(label)", "background-color" => "#0074D9")),
+#                     Dict("selector" => "edge", "style" => Dict("label" => "data(label)", "line-color" => "#FF4136", "width" => 2))
+#                 ]
+#             )
+#         ])
 
-        # Iniciar el servidor Dash y mostrar el grafo
-        run_server(app, "0.0.0.0", 8050)
-    end
-end
+#         # Iniciar el servidor Dash y mostrar el grafo
+#         run_server(app, "0.0.0.0", 8050)
+#     end
+# end
 
 serve(port=8001)
