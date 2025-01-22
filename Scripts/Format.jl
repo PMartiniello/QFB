@@ -42,14 +42,14 @@ function format(B::Vector{Int64})
     #     @argcheck(length(string(b)) == 3)
     # end
     for b in B
-        if length(b) != 3
+        if length(string(b)) != 3
             return nothing, nothing
         end
     end
 
     v = listvert(B)
-
-    for b in Base
+    F = Vector{Int64}[]
+    for b in B
         # Convertimos SubString a String con map(String, ...)
         u,d,c = digits(b) # unidad decena centena
         push!(F, [c, d, u]) #se guarda en el orden reverso: centena, decena, unidad
