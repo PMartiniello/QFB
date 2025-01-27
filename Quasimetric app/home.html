@@ -21,3 +21,46 @@
     </form>
 </body>
 </html>
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <script>
+        function toggleSymmetryOption() {
+            const functionChoice = document.querySelector('input[name="function"]:checked').value;
+            const symmetryOptions = document.getElementById("symmetry");
+
+            // Deshabilitar simetría si no se elige "minimización norma 1"
+            if (functionChoice === "norma1") {
+                symmetryOptions.disabled = false;
+            } else {
+                symmetryOptions.disabled = true;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Inicio</h1>
+    <form action="/process" method="get">
+        <label for="function">Seleccione una funcionalidad:</label><br>
+        <input type="radio" id="norma1" name="function" value="norma1" onclick="toggleSymmetryOption()" required>
+        <label for="norma1">Minimización norma 1</label><br>
+        <input type="radio" id="moresimmetric" name="function" value="moresimmetric" onclick="toggleSymmetryOption()" required>
+        <label for="moresimmetric">Minimización que penaliza asimetría</label><br><br>
+
+        <label for="symmetry">Opciones de simetría:</label>
+        <select id="symmetry" name="symmetry" disabled>
+            <option value="symmetric">Simétrico</option>
+            <option value="nonsymmetric">No simétrico</option>
+        </select><br><br>
+
+        <label for="betweenness">Ingrese tríos separados por coma:</label><br>
+        <input type="text" id="betweenness" name="betweenness" required><br><br>
+
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html> -->
+
