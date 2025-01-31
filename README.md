@@ -1,5 +1,5 @@
 # Quasimetric-from-betweenness
-QFB.jl is a package made to help study the discrete quasimetric spaces spanned from betweenness. The betweenness is a ternary relation between vertices in a discrete space. For a betweenness $B$ some points $$a, \ b$$ and $$c$$ are such that $$abc \in B$ if and only if $$d(a,b) + d(b,c) = d(a,c)$$.
+QFB.jl is a package made to help study the discrete quasimetric spaces spanned from betweenness. The betweenness is a ternary relation between vertices in a discrete space. For a betweenness $$B$$ some points $$a, \ b$$ and $$c$$ are such that $$abc \in B$$ if and only if $$d(a,b) + d(b,c) = d(a,c)$$.
 
 For a certain betweenness $$B$$ the quasimetric $$Q(B)$$ that we study is the one that satisfies the following ILP:
 
