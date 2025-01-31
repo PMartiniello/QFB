@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Cuasimétrica</title>
+    <title>Formulario de Cuasimétrica: norma 1</title>
 </head>
 <body>
-    <h1>Formulario de Cuasimétrica</h1>
-    
-    {{#error_message}}
-        <p style="color: red;">{{error_message}}</p>
-    {{/error_message}}
-    
+    <h1>Formulario de Cuasimétrica: norma 1</h1>
     <form action="/quasimetric/" method="get">
         <label for="betweenness">Tríos separados por coma:</label>
-        <input type="text" id="betweenness" name="betweenness" value="{{input_value}}" required>
+        <input type="text" id="betweenness" name="betweenness" placeholder="abc, cba, ... / 123, 321, ..." value="" required>
         <br><br>
         <label for="symmetry">¿Quiere solo soluciones simétricas?:</label><br>
         <input type="radio" id="symmetric" name="symmetry" value="symmetric" required>

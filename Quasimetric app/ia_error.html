@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Cuasimétrica: índice de asimetría</title>
+</head>
+<body>
+    <h1>Formulario de Cuasimétrica: índice de asimetría</h1>
+    
+    {{#error_message}}
+        <p style="color: red;">{{error_message}}</p>
+    {{/error_message}}
+    
+    <form action="/asimetria/" method="get">
+        <label for="betweenness">Tríos separados por coma:</label>
+        <input type="text" id="betweenness" name="betweenness" value="{{input_value}}" required>
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>

@@ -1,12 +1,6 @@
 using Oxygen
 using HTTP
 using Mustache
-# using Dash
-# using DashHtmlComponents
-# const html = DashHtmlComponents
-# using DashCoreComponents
-# const dcc = DashCoreComponents
-# using DashCytoscape
 using Graphs
 
 include.(filter(contains(r".jl$"), readdir("../Scripts/"; join=true)))
@@ -27,14 +21,6 @@ function render_html(html_file::String, context::Dict = Dict(); status = 200, he
         template = String(Mustache.render(io, context))
     end
     return HTTP.Response(status, headers, body = template)
-end
-
-@get "/vertices/{betweenness}" function (req::HTTP.Request, betweenness::Vector{String})
-    return listvert(betweenness)
-end
-
-@get "/home" function (req::HTTP.Request)
-    render_html("home.html")
 end
 
 function create_html_table(valores_x, v)
@@ -59,19 +45,27 @@ function create_html_table(valores_x, v)
     """
 end
 
+@get "/vertices/{betweenness}" function (req::HTTP.Request, betweenness::Vector{String})
+    return listvert(betweenness)
+end
+
+@get "/home" function (req::HTTP.Request)
+    render_html("home.html")
+end
+
+@get "/norma1" function (req::HTTP.Request)
+    render_html("norma1.html")
+end
+
+@get "/asymindex" function (req::HTTP.Request)
+    render_html("asymindex.html")
+end
+
 @get "/quasimetric/" function (req::HTTP.Request)
     # Obtener los parámetros de consulta
     form_data = queryparams(req)
     betweenness = get(form_data, "betweenness", "")
     symmetry_option = get(form_data, "symmetry", "")
-
-    # Procesar el parámetro betweenness
-    # if !haskey(form_data, "betweenness")
-    #     return HTTP.Response(400, "Parámetro 'betweenness' faltante.")
-    # end
-    if !haskey(form_data, "betweenness")
-        return HTTP.Redirect("http://127.0.0.1:8001/home")
-    end
     
     betweenness = form_data["betweenness"]
     triples_list = map(s -> strip(String(s)), split(betweenness, ","))
@@ -81,22 +75,20 @@ end
     symtype = symmetry_option == "symmetric" ? sym() : nosym()
     modelo, valores_x, v = quasimetric(b_format, symtype)
 
-    # modelo, valores_x, v = quasimetric(b_format)
-
-    if modelo === nothing
+    if modelo === nothing # Error de formato
         error_context = Dict(
             "error_message" => "El formato no es correcto, por favor entregue tríos.",
             "input_value" => betweenness
         )
-        return render_html("error.html", error_context)
+        return render_html("n1_error.html", error_context)
     end
 
-    if valores_x === nothing
+    if valores_x === nothing # Error de factibilidad
         error_context = Dict(
             "error_message" => "La betweenness proporcionada no es factible.",
             "input_value" => betweenness
         )
-        return render_html("error.html", error_context)
+        return render_html("n1_error.html", error_context)
     end
     
     Q = [valores_x[i, :] for i in eachindex(v)]
@@ -112,209 +104,50 @@ end
     )
     
     # Renderizar la página de resultados
-    return render_html("result.html", context)
+    return render_html("n1_result.html", context)
 end
 
-# function create_interactive_graph(B::Vector, html_file::String)
-#     # Recibe la betweenness B y genera la página con el grafo interactivo
-#     modelo, Q, V = quasimetric(B)
-    
-#     if Q === nothing
-#         # Si no es factible, regresa un mensaje de error
-#         error_context = Dict(
-#             "error_message" => "La betweenness proporcionada no es factible."
-#         )
-#         return render_html("form.html", error_context)
-#     else
-#         optimize!(modelo)
-#         n = length(V)  # Cantidad de vértices
-        
-#         # Crear lista de nodos
-#         nodes = [Dict("data" => Dict("id" => string(i), "label" => string(V[i]))) for i in 1:n]
+@get "/asimetria" function (req::HTTP.Request)
+    form_data = queryparams(req)
+    betweenness = get(form_data, "betweenness", "")
 
-#         # Crear lista de aristas
-#         edges = []
-#         for i in eachindex(V)
-#             for j in eachindex(V)
-#                 if i != j
-#                     # Agregar la arista con el peso como etiqueta
-#                     push!(edges, Dict(
-#                         "data" => Dict("source" => string(i), "target" => string(j), "label" => string(round(Q[i, j], digits=2)))
-#                     ))
-#                     if midpoint(B, i, j) == true
-#                         # Remover la arista directa si hay un vértice intermedio
-#                         pop!(edges)
-#                     end
-#                 end
-#             end
-#         end
+    if isempty(betweenness)
+        return HTTP.Response(302, ["Location" => "/asymindex"])
+    end
 
-#         # Crear grafo interactivo con Cytoscape
-#         app = dash()
+    triples_list = map(s -> strip(String(s)), split(betweenness, ","))
+    b_format = unique(map(String, triples_list))
 
-#         app.layout = html.div([
-#             html.h1("Grafo Interactivo de Cuasimétrica"),
-#             dcc.Input(
-#                 id="betweenness-input",
-#                 placeholder="Ingrese los tríos de betweenness...",
-#                 type="text",
-#                 value=join(B, ", ")
-#             ),
-#             DashCytoscape.cytoscape(
-#                 id="cytoscape",
-#                 style=Dict("width" => "100%", "height" => "600px"),
-#                 elements=vcat(nodes, edges),
-#                 layout=Dict("name" => "cose", "animate" => true),  # Layout interactivo
-#                 stylesheet=[
-#                     Dict("selector" => "node", "style" => Dict("label" => "data(label)", "background-color" => "#0074D9")),
-#                     Dict("selector" => "edge", "style" => Dict("label" => "data(label)", "line-color" => "#FF4136", "width" => 2))
-#                 ]
-#             )
-#         ])
+    modelo, valores_x, dif_x, v = ms(b_format)
 
-#         # Iniciar el servidor Dash y mostrar el grafo
-#         run_server(app, "0.0.0.0", 8050)
-#     end
-# end
+    if modelo === nothing # Error de fomrato
+        error_context = Dict(
+            "error_message" => "El formato no es correcto, por favor entregue tríos.",
+            "input_value" => betweenness
+        )
+        return render_html("ia_error.html", error_context)
+    end
 
-serve(port=8001)
+    if valores_x === nothing # Error de factibilidad
+        error_context = Dict(
+            "error_message" => "La betweenness proporcionada no es factible.",
+            "input_value" => betweenness
+        )
+        return render_html("ia_error.html", error_context)
+    end
 
-# using Oxygen
-# using HTTP
-# using Mustache
-# using Graphs
+    # Crear tablas HTML para mostrar las matrices de distancias y diferencias
+    html_table_distancias = create_html_table(valores_x, v)
+    html_table_diferencias = create_html_table(dif_x, v)
 
-# include.(filter(contains(r".jl$"), readdir("../Scripts/"; join=true)))
+    # Contexto para renderizar el HTML
+    context = Dict(
+        "input_triples" => join(unique(b_format), ", "),
+        "vertices" => join(v, ", "),
+        "html_table_distancias" => html_table_distancias,
+        "html_table_diferencias" => html_table_diferencias
+    )
 
-# function render_html(html_file::String, context::Dict = Dict(); status = 200, headers = ["Content-Type" => "text/html; charset_utf-8"]) :: HTTP.Response
-#     io = open(html_file, "r") do file
-#         read(file, String)
-#     end
-#     template = isempty(context) ? io : String(Mustache.render(io, context))
-#     return HTTP.Response(status, headers, body = template)
-# end
-
-# @get "/home" function (req::HTTP.Request)
-#     render_html("home.html")
-# end
-
-# function create_html_table(valores_x, v)
-#     table_rows = String[]
-#     for i in eachindex(v)
-#         row = "<tr><th>$(v[i])</th>" * join(["<td>$(round(valores_x[i, j], digits=2))</td>" for j in eachindex(v)], "") * "</tr>"
-#         push!(table_rows, row)
-#     end
-
-#     return """
-#     <table border="1" style="border-collapse: collapse; text-align: center; width: 100%;">
-#         <thead>
-#             <tr style="background-color: #f4f4f4;">
-#                 <th></th>
-#                 $(join(["<th>$(v[j])</th>" for j in eachindex(v)], ""))
-#             </tr>
-#         </thead>
-#         <tbody>
-#             $(join(table_rows, ""))
-#         </tbody>
-#     </table>
-#     """
-# end
-
-# @get "/quasimetric/" function (req::HTTP.Request)
-#     form_data = queryparams(req)
-#     betweenness = get(form_data, "betweenness", "")
-#     symmetry_option = get(form_data, "symmetry", "")
-
-#     if !haskey(form_data, "betweenness")
-#         return HTTP.Redirect("/home")
-#     end
-
-#     triples_list = map(s -> strip(String(s)), split(betweenness, ","))
-#     b_format = unique(map(String, triples_list))
-#     symtype = symmetry_option == "symmetric" ? sym() : nosym()
-
-#     modelo, valores_x, v = quasimetric(b_format, symtype)
-
-#     if modelo === nothing || valores_x === nothing
-#         error_context = Dict("error_message" => "La betweenness proporcionada no es factible.", "input_value" => betweenness)
-#         return render_html("error.html", error_context)
-#     end
-
-#     html_table = create_html_table(valores_x, v)
-#     context = Dict(
-#         "input_triples" => join(unique(b_format), ", "),
-#         "vertices" => join(v, ", "),
-#         "html_table" => html_table
-#     )
-
-#     return render_html("result.html", context)
-# end
-
-# @get "/moresimmetric" function (req::HTTP.Request)
-#     form_data = queryparams(req)
-#     betweenness = get(form_data, "betweenness", "")
-
-#     if isempty(betweenness)
-#         error_context = Dict(
-#             "error_message" => "Debe ingresar los tríos de betweenness.",
-#             "input_value" => betweenness
-#         )
-#         return render_html("error.html", error_context)
-#     end
-
-#     triples_list = map(s -> strip(String(s)), split(betweenness, ","))
-#     b_format = unique(map(String, triples_list))
-
-#     modelo, dist_x, dif_x, v = ms(b_format)
-
-#     if modelo === nothing || dist_x === nothing
-#         error_context = Dict(
-#             "error_message" => "La betweenness proporcionada no es factible.",
-#             "input_value" => betweenness
-#         )
-#         return render_html("error.html", error_context)
-#     end
-
-#     Q = [dist_x[i, :] for i in eachindex(v)]
-#     html_table = create_html_table(dist_x, v)
-
-#     context = Dict(
-#         "input_triples" => join(unique(b_format), ", "),
-#         "vertices" => join(v, ", "),
-#         "html_table" => html_table,
-#         "symmetry_index" => round(dif_x, digits=4)
-#     )
-
-#     return render_html("result.html", context)
-# end
-
-# @get "/process" function (req::HTTP.Request)
-#     form_data = queryparams(req)
-#     function_choice = get(form_data, "function", "")
-#     betweenness = get(form_data, "betweenness", "")
-#     symmetry_option = get(form_data, "symmetry", "")
-
-#     if isempty(betweenness)
-#         error_context = Dict(
-#             "error_message" => "Debe ingresar los tríos de betweenness.",
-#             "input_value" => betweenness
-#         )
-#         return render_html("error.html", error_context)
-#     end
-
-#     if function_choice == "norma1"
-#         return HTTP.Response(302, ["Location" => "/quasimetric/?betweenness=$betweenness&symmetry=$symmetry_option"])
-#     elseif function_choice == "moresimmetric"
-#         return HTTP.Response(302, ["Location" => "/moresimmetric/?betweenness=$betweenness"])
-#     else
-#         error_context = Dict(
-#             "error_message" => "Debe seleccionar una funcionalidad válida.",
-#             "input_value" => betweenness
-#         )
-#         return render_html("error.html", error_context)
-#     end
-# end
-
-
-
-# serve(port=8001)
+    # Renderizar resultados
+    return render_html("ia_result.html", context)
+end
