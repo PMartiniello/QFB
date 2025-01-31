@@ -5,11 +5,30 @@ For a certain betweenness $$B$$ the quasimetric $$Q(B)$$ that we study is the on
 
 min $$C$$
 st $$\sum_{x, \ y \in V} Q_{x,y} \leq C$$
+
 $$Q_{x, y} = 0$$  $$\iff x = y$$
+
 $$Q_{x, y} + Q_{y, z} = Q_{x, z} \ \forall (x,y,z) \in B $$
+
 $$Q_{x, y} + Q_{y, z} \geq Q_{x, z} + 1 \ \forall (x,y,z) \notin B $$ 
-$$Q_{x,y} \in \mathbb{N}
 
-A matrix $$Q(B)$$ that satisfies this will be a representation of the quasimetric with betweenness $B$ and the minimal norm $$||Q||_1 = \sum_{x,\ y \in V}Q_{x,y}$$.
+$$Q_{x,y} \in \mathbb{N}$$
 
-In case $$Q(B)$$ exists it will also be represented as a weighted digraph, using the least arcs possible.
+Note that in this case, the ILP minimizes $$||Q||_1 = \sum_{x,\ y \in V}Q_{x,y}$$.
+
+Another function provided in the repository is a LP that penalizes the assymetry of $$Q(B)$$
+
+min $$\sum_{x,y}D_{x,y}$$
+st $$Q_{x,y} \leq D_{x,y}$$
+
+$$Q_{x, y} = 0$$  $$\iff x = y$$
+
+$$Q_{x, y} + Q_{y, z} = Q_{x, z} \ \forall (x,y,z) \in B $$
+
+$$Q_{x, y} + Q_{y, z} \geq Q_{x, z} + 1 \ \forall (x,y,z) \notin B $$ 
+
+$$D{x,y} = D{y,x} \forall x, y$$
+
+A matrix $$Q(B)$$ that satisfies this will be a representation of the quasimetric with betweenness $B$, minimizing a selected function.
+
+$$Q(B)$$ can also be represented by a weighted digraph. The display of that is still pending in this repository.
