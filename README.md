@@ -15,7 +15,7 @@ $$Q_{x, y} + Q_{y, z} \geq Q_{x, z} + 1 \ \forall (x,y,z) \notin B $$
 
 $$Q_{x,y} \in \mathbb{N}$$
 
-Note that in this case, the ILP minimizes $$||Q||_{1} = \sum_{x,\ y \in V}Q_{x,y}$$.
+Note that in this case, the ILP minimizes $$\lVert Q \rVert$$ <sub>1</sub> = $$\sum$$ <sub> x,\ y \in V </sub> $$Q$$ <sub>x, y</sub>x,y.
 
 Another function provided in the repository is a LP that penalizes the assymetry of $$Q(B)$$
 
