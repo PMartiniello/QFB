@@ -1,5 +1,4 @@
 function listvert(L::Vector{String})
-    # n = length(L)
     char = String[]
     for i in eachindex(L)
         # Dividir la cadena en caracteres y convertirlos a String
@@ -14,7 +13,7 @@ end
 function listvert(L::Vector{Int64})
     vert = Int64[]
     for i in eachindex(L)
-        u, d, c = digits(i) #a unidad, b decena, c centena
+        u, d, c = digits(i) #unidad, decena, centena
 
         push!(vert, c)
         push!(vert, d)

@@ -3,9 +3,6 @@ using Combinatorics
 function format(B::Vector{String})
     # Recibe la betweenness como una lista con str de largo 3
     # Devuelve betweenness formateada con 3 str por elemento de la lista y los tríos que no están en la betweenness
-    # for b in B
-    #     @argcheck(length(b) == 3)
-    # end
 
     for b in B
         if length(b) != 3
@@ -38,9 +35,7 @@ function format(B::Vector{String})
 end
 
 function format(B::Vector{Int64})
-    # for b in B
-    #     @argcheck(length(string(b)) == 3)
-    # end
+
     for b in B
         if length(string(b)) != 3
             return nothing, nothing

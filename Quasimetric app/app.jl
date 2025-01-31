@@ -1,7 +1,6 @@
 using Oxygen
 using HTTP
 using Mustache
-using Graphs
 
 include.(filter(contains(r".jl$"), readdir("../Scripts/"; join=true)))
 
