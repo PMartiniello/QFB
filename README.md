@@ -3,10 +3,11 @@ QFB.jl is a package made to help study the discrete quasimetric spaces spanned f
 
 For a certain betweenness $$B$$ the quasimetric $$Q(B)$$ that we study is the one that satisfies the following ILP:
 
-min $$C$$
-st $$\sum_{x, \ y \in V} Q_{x,y} \leq C$$
+$$\text{min } C$$
 
-$$Q_{x, y} = 0$$  $$\iff x = y$$
+$$\text{st } \sum_{x, \ y \in V} Q_{x,y} \leq C$$
+
+$$Q_{x, y} = 0 \ \iff x = y$$
 
 $$Q_{x, y} + Q_{y, z} = Q_{x, z} \ \forall (x,y,z) \in B $$
 
@@ -14,14 +15,15 @@ $$Q_{x, y} + Q_{y, z} \geq Q_{x, z} + 1 \ \forall (x,y,z) \notin B $$
 
 $$Q_{x,y} \in \mathbb{N}$$
 
-Note that in this case, the ILP minimizes $$||Q||_1 = \sum_{x,\ y \in V}Q_{x,y}$$.
+Note that in this case, the ILP minimizes $$||Q||_{1} = \sum_{x,\ y \in V}Q_{x,y}$$.
 
 Another function provided in the repository is a LP that penalizes the assymetry of $$Q(B)$$
 
-min $$\sum_{x,y}D_{x,y}$$
-st $$Q_{x,y} \leq D_{x,y}$$
+$$\text{min }\sum_{x,y}D_{x,y}$$
 
-$$Q_{x, y} = 0$$  $$\iff x = y$$
+$$\text{st } Q_{x,y} \leq D_{x,y}$$
+
+$$Q_{x, y} = 0 \ \iff x = y$$
 
 $$Q_{x, y} + Q_{y, z} = Q_{x, z} \ \forall (x,y,z) \in B $$
 
