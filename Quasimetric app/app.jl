@@ -4,6 +4,10 @@ using Mustache
 
 include.(filter(contains(r".jl$"), readdir("../Scripts/"; join=true)))
 
+# Registrar carpeta static/
+# staticfiles("/quasimetric/static", joinpath(@__DIR__, "static"))
+staticfiles("static", "static")
+
 function render_html(html_file::String, context::Dict = Dict(); status = 200, headers = ["Content-Type" => "text/html; charset_utf-8"]) :: HTTP.Response
     is_context_empty = isempty(context) === true
     # return raw html without context
@@ -43,6 +47,7 @@ function create_html_table(valores_x, v)
     </table>
     """
 end
+
 
 @get "/vertices/{betweenness}" function (req::HTTP.Request, betweenness::Vector{String})
     return listvert(betweenness)
@@ -94,13 +99,23 @@ end
 
     # Crear tabla HTML
     html_table = create_html_table(valores_x, v)
+    
+    creategraph(b_format, symtype; img_path="static/graph.png")
 
     # Contexto para renderizar el HTML
+    # context = Dict(
+    #     "input_triples" => join(unique(b_format), ", "),
+    #     "vertices" => join(v, ", "),
+    #     "html_table" => html_table
+    # )
+
     context = Dict(
-        "input_triples" => join(unique(b_format), ", "),
-        "vertices" => join(v, ", "),
-        "html_table" => html_table
-    )
+    "input_triples" => join(unique(b_format), ", "),
+    "vertices" => join(v, ", "),
+    "html_table" => html_table,
+    "graph_image" => "static/graph.png"  # <-- clave para HTML
+)
+
     
     # Renderizar la página de resultados
     return render_html("n1_result.html", context)
@@ -150,3 +165,5 @@ end
     # Renderizar resultados
     return render_html("ia_result.html", context)
 end
+
+serve()

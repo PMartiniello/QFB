@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -19,5 +19,63 @@
         <br>
         <button type="submit">Enviar</button>
     </form>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Cuasimétrica: norma 1</title>
+    <style>
+        #betweenness {
+            font-size: 16px;
+            padding: 5px;
+            min-width: 300px;
+            max-width: 100%;
+        }
+
+        /* Este span invisible servirá para medir el tamaño del texto */
+        #textSizer {
+            visibility: hidden;
+            position: absolute;
+            white-space: pre;
+            font-size: 16px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h1>Formulario de Cuasimétrica: norma 1</h1>
+    <form action="/quasimetric/" method="get">
+        <label for="betweenness">Tríos separados por coma:</label>
+        <input type="text" id="betweenness" name="betweenness" placeholder="abc, cba, ... / 123, 321, ..." value="" required>
+        <span id="textSizer"></span>
+        <br><br>
+
+        <label for="symmetry">¿Quiere solo soluciones simétricas?:</label><br>
+        <input type="radio" id="symmetric" name="symmetry" value="symmetric" required>
+        <label for="symmetric">Sí, soluciones simétricas</label><br>
+        <input type="radio" id="non_symmetric" name="symmetry" value="non_symmetric" required>
+        <label for="non_symmetric">No, cualquier solución</label><br>
+        <br>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <script>
+        const input = document.getElementById("betweenness");
+        const sizer = document.getElementById("textSizer");
+
+        function resizeInput() {
+            sizer.textContent = input.value || input.placeholder;
+            input.style.width = (sizer.offsetWidth + 20) + "px";
+        }
+
+        input.addEventListener("input", resizeInput);
+
+        // Inicial
+        resizeInput();
+    </script>
 </body>
 </html>
